@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annual Leave Balance Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f3f4f6;
+            min-height: 100vh;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            background-color: white;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .icon {
+            width: 32px;
+            height: 32px;
+            color: #2563eb;
+        }
+
+        .icon-sm {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        /* Input controls */
+        .input-group {
+            background-color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Summary cards */
+        .card {
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-blue {
+            background-color: #ebf7ff;
+            border: 1px solid #bfdbfe;
+        }
+
+        .card-green {
+            background-color: #ecf9f8;
+            border: 1px solid #bbf7d0;
+        }
+
+        .card-orange {
+            background-color: #fef3f2;
+            border: 1px solid #fed7aa;
+        }
+
+        .card-content p:first-child {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .card-content p:nth-child(2) {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .card-content p:last-child {
+            font-size: 0.75rem;
+            margin-top: 2px;
+        }
+
+        .card-blue .card-content p:first-child { color: #2563eb; }
+        .card-blue .card-content p:nth-child(2) { color: #1e3a8a; }
+        .card-blue .card-content p:last-child { color: #2563eb; }
+
+        .card-green .card-content p:first-child { color: #16a34a; }
+        .card-green .card-content p:nth-child(2) { color: #14532d; }
+        .card-green .card-content p:last-child { color: #16a34a; }
+
+        .card-orange .card-content p:first-child { color: #ea580c; }
+        .card-orange .card-content p:nth-child(2) { color: #9a3412; }
+        .card-orange .card-content p:last-child { color: #ea580c; }
+
+        /* Timeline */
+        .timeline-container {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .timeline-container h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-blue { background-color: #3b82f6; }
+        .dot-green { background-color: #10b981; }
+
+        .timeline-text h3 {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+
+        .timeline-text p {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .timeline-right {
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .change-positive {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #16a34a;
+        }
+
+        .balance {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        /* Details section */
+        .details {
+            margin-top: 24px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .details h3 {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .details-list {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .details-list p {
+            margin-bottom: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .timeline-right {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z"></path>
+                </svg>
+                Annual Leave Balance Calculator
+            </h1>
+            <p>Track your leave balance with biweekly accruals</p>
+        </div>
+
+        <!-- Input Controls -->
+        <div class="grid grid-3" style="margin-bottom: 32px;">
+            <div class="input-group">
+                <label for="currentBalance">Current Balance (hours)</label>
+                <input
+                    type="number"
+                    id="currentBalance"
+                    value="50"
+                    step="0.25"
+                    oninput="updateCalculation()"
+                />
+            </div>
+
+            <div class="input-group">
+                <label for="accrualRate">Accrual Rate (hours every 2 weeks)</label>
+                <input
+                    type="number"
+                    id="accrualRate"
+                    value="6.15"
+                    step="0.25"
+                    oninput="updateCalculation()"
+                />
+            </div>
+
+            <div class="input-group">
+                <label for="projectionDate">Projected Leave Date</label>
+                <input
+                    type="date"
+                    id="projectionDate"
+                    onchange="updateCalculation()"
+                />
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-3" style="margin-bottom: 32px;">
+            <div class="card card-blue">
+                <div class="card-content">
+                    <p>Current Balance</p>
+                    <p id="currentBalanceDisplay">50 hrs</p>
+                </div>
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+
+            <div class="card card-green">
+                <div class="card-content">
+                    <p>Projected Balance</p>
+                    <p id="projectedBalance">50.00 hrs</p>
+                    <p id="projectionPeriod">until selected date</p>
+                </div>
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+            </div>
+
+            <div class="card card-orange">
+                <div class="card-content">
+                    <p>Total to Accrue</p>
+                    <p id="totalAccrued">+0.00 hrs</p>
+                    <p>over projection period</p>
+                </div>
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Balance Timeline -->
+        <div class="timeline-container">
+            <h2>Balance Timeline</h2>
+            <div id="timeline">
+                <!-- Timeline will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="details">
+            <h3>Calculation Details</h3>
+            <div class="details-list" id="calculationDetails">
+                <!-- Details will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getNextAccrualMonday() {
+            // Next accrual is August 4, 2025
+            const nextAccrual = new Date(2025, 7, 4); // Month is 0-indexed, so 7 = August
+            const today = new Date();
+            
+            // If August 4 has passed, calculate the next accrual in the biweekly cycle
+            if (nextAccrual < today) {
+                const daysSinceAug4 = Math.floor((today - nextAccrual) / (1000 * 60 * 60 * 24));
+                const cyclesPassed = Math.floor(daysSinceAug4 / 14);
+                const nextCycle = cyclesPassed + 1;
+                const nextAccrualDate = new Date(nextAccrual);
+                nextAccrualDate.setDate(nextAccrual.getDate() + (nextCycle * 14));
+                return nextAccrualDate;
+            }
+            
+            return nextAccrual;
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        function generateProjection() {
+            const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
+            const accrualRate = parseFloat(document.getElementById('accrualRate').value) || 0;
+            const projectionDateInput = document.getElementById('projectionDate').value;
+            
+            if (!projectionDateInput) {
+                // Default to 1 week from now if no date selected
+                const defaultDate = new Date();
+                defaultDate.setDate(defaultDate.getDate() + 7);
+                document.getElementById('projectionDate').value = defaultDate.toISOString().split('T')[0];
+            }
+            
+            const projectionEndDate = new Date(document.getElementById('projectionDate').value);
+
+            const projection = [];
+            const startDate = new Date();
+            let currentBal = currentBalance;
+            let nextAccrualDate = getNextAccrualMonday();
+            
+            // Add current balance
+            projection.push({
+                date: new Date(startDate),
+                balance: currentBalance,
+                change: 0,
+                type: 'current',
+                description: 'Current Balance'
+            });
+
+            // Project future accruals until the target date
+            let currentAccrualDate = new Date(nextAccrualDate);
+            while (currentAccrualDate <= projectionEndDate) {
+                currentBal += accrualRate;
+                projection.push({
+                    date: new Date(currentAccrualDate),
+                    balance: currentBal,
+                    change: accrualRate,
+                    type: 'accrual',
+                    description: 'Accrual'
+                });
+                
+                // Next accrual is 2 weeks later
+                currentAccrualDate.setDate(currentAccrualDate.getDate() + 14);
+            }
+
+            return projection;
+        }
+
+        function updateCalculation() {
+            const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
+            const accrualRate = parseFloat(document.getElementById('accrualRate').value) || 0;
+            const projectionDateInput = document.getElementById('projectionDate').value;
+
+            const projectionData = generateProjection();
+            const finalBalance = projectionData[projectionData.length - 1]?.balance || currentBalance;
+            const totalAccrued = projectionData
+                .filter(item => item.type === 'accrual')
+                .reduce((sum, item) => sum + item.change, 0);
+
+            // Calculate days until projection date
+            let projectionText = "until selected date";
+            if (projectionDateInput) {
+                const projectionDate = new Date(projectionDateInput);
+                const today = new Date();
+                const timeDiff = projectionDate.getTime() - today.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                if (daysDiff >= 0) {
+                    projectionText = `until ${formatDate(projectionDate)} (${daysDiff} days)`;
+                } else {
+                    projectionText = `until ${formatDate(projectionDate)} (${Math.abs(daysDiff)} days ago)`;
+                }
+            }
+
+            // Update summary cards
+            document.getElementById('currentBalanceDisplay').textContent = currentBalance + ' hrs';
+            document.getElementById('projectedBalance').textContent = finalBalance.toFixed(2) + ' hrs';
+            document.getElementById('projectionPeriod').textContent = projectionText;
+            document.getElementById('totalAccrued').textContent = '+' + totalAccrued.toFixed(2) + ' hrs';
+
+            // Update timeline
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+            
+            projectionData.forEach((item, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                
+                const dotClass = item.type === 'current' ? 'dot-blue' : 'dot-green';
+                
+                const changeDisplay = item.change !== 0 ? 
+                    `<span class="change-positive">
+                        +${item.change} hrs
+                    </span>` : '';
+
+                timelineItem.innerHTML = `
+                    <div class="timeline-left">
+                        <div class="timeline-dot ${dotClass}"></div>
+                        <div class="timeline-text">
+                            <h3>${item.description}</h3>
+                            <p>${formatDate(item.date)}</p>
+                        </div>
+                    </div>
+                    <div class="timeline-right">
+                        ${changeDisplay}
+                        <span class="balance">${item.balance.toFixed(2)} hrs</span>
+                    </div>
+                `;
+                
+                timeline.appendChild(timelineItem);
+            });
+
+            // Update calculation details
+            const details = document.getElementById('calculationDetails');
+            const nextAccrualDate = getNextAccrualMonday();
+            const annualRate = (accrualRate * 26).toFixed(1);
+            
+            details.innerHTML = `
+                <p>• Leave accrues at ${accrualRate} hours every other Monday</p>
+                <p>• Annual accrual rate: ~${annualRate} hours per year</p>
+                <p>• Next accrual date: ${formatDate(nextAccrualDate)}</p>
+            `;
+        }
+
+        // Initialize calculation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCalculation();
+        });
+    </script>
+</body>
+</html>
